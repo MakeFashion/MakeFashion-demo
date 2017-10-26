@@ -1,7 +1,7 @@
 /* MakeFashion LED control example
  * -------------------------------
  * This software demos LED control using Seeed Studio's ultrasonic range finder module to toggle power to the LEDs
- * and using a sound sensor to switch LED modes.
+ * and using a touch sensor to switch LED modes.
  * 
  * Requires:
  * ---------
@@ -33,12 +33,11 @@ FASTLED_USING_NAMESPACE
 #define LED_TYPE           WS2812B
 #define COLOR_ORDER        GRB
 #define NUM_LEDS1          32
-#define NUM_LEDS2          32
+#define NUM_LEDS2          37
 #define BRIGHTNESS         96
 #define FRAMES_PER_SECOND  120
 
 #define THRESHOLD_RANGE 10.0 //centimeters
-#define THRESHOLD_SOUND 1000
 
 CRGB leds_array1[NUM_LEDS1];
 CRGB leds_array2[NUM_LEDS2];
@@ -49,6 +48,9 @@ void rainbow(CRGB *gArray, int gSize);
 void rainbowWithGlitter(CRGB *gArray, int gSize);
 void confetti(CRGB *gArray, int gSize);
 void sinelon(CRGB *gArray, int gSize);
+void sinelon_red(CRGB *gArray, int gSize);
+void sinelon_blue(CRGB *gArray, int gSize);
+void sinelon_redblue(CRGB *gArray, int gSize);
 void juggle(CRGB *gArray, int gSize);
 void bpm(CRGB *gArray, int gSize);
 void juggle(CRGB *gArray, int gSize);
@@ -60,7 +62,8 @@ void blinky(CRGB *gArray, int gSize);
 
 // List of patterns to cycle through.  Each is defined as a separate function below.
 typedef void (*SimplePatternList)(CRGB *, int);
-SimplePatternList gPatterns[] = { rainbow, rainbowWithGlitter, confetti, sinelon, juggle, bpm };
+SimplePatternList gPatterns1[] = { rainbow, rainbowWithGlitter, confetti, sinelon, juggle, bpm };
+SimplePatternList gPatterns2[] = { sinelon_red, sinelon_blue, juggle_red, juggle_blue, sinelon_redblue, juggle_redblue };
 
 uint8_t gArray1_PatternNumber = 0; // Pattern selector array 1
 uint8_t gArray2_PatternNumber = 0; // Pattern selector array 2
@@ -84,8 +87,8 @@ void setup() {
 void loop()
 {
   // Call the current pattern function once, updating the 'leds' array
-  gPatterns[gArray1_PatternNumber](leds_array1, NUM_LEDS1);
-  gPatterns[gArray2_PatternNumber](leds_array2, NUM_LEDS2);
+  gPatterns1[gArray1_PatternNumber](leds_array1, NUM_LEDS1);
+  gPatterns2[gArray2_PatternNumber](leds_array2, NUM_LEDS2);
   ultrasonic_range = ultrasonic.MeasureInCentimeters();
 
   if (ultrasonic_range < 4.0) {
@@ -106,8 +109,8 @@ void loop()
 void nextPattern()
 {
   // add one to the current pattern number, and wrap around at the end
-  gArray1_PatternNumber = (gArray1_PatternNumber + 1) % ARRAY_SIZE(gPatterns);
-  gArray2_PatternNumber = random(0, ARRAY_SIZE(gPatterns));
+  gArray1_PatternNumber = (gArray1_PatternNumber + 1) % ARRAY_SIZE(gPatterns1);
+  gArray2_PatternNumber = (gArray2_PatternNumber + 1) % ARRAY_SIZE(gPatterns2);
 }
 
 void rainbow(CRGB *gArray, int gSize)
